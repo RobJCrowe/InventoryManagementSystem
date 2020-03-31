@@ -1,0 +1,373 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="InventoryMgmtModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="partsdb">
+          <Key>
+            <PropertyRef Name="partid" />
+          </Key>
+          <Property Name="partid" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="createdby" Type="int" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="price" Type="money" Nullable="false" />
+          <Property Name="instock" Type="int" Nullable="false" />
+          <Property Name="min" Type="int" Nullable="false" />
+          <Property Name="max" Type="int" Nullable="false" />
+          <Property Name="type" Type="nchar" MaxLength="1" Nullable="false" />
+          <Property Name="details" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="lastmodified" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="productsdb">
+          <Key>
+            <PropertyRef Name="productid" />
+          </Key>
+          <Property Name="productid" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="createdby" Type="int" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="price" Type="money" Nullable="false" />
+          <Property Name="instock" Type="int" Nullable="false" />
+          <Property Name="min" Type="int" Nullable="false" />
+          <Property Name="max" Type="int" Nullable="false" />
+          <Property Name="lastmodified" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="productsparts">
+          <Key>
+            <PropertyRef Name="productpartid" />
+          </Key>
+          <Property Name="productpartid" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="productid" Type="int" Nullable="false" />
+          <Property Name="partid" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
+        <EntityType Name="usertable">
+          <Key>
+            <PropertyRef Name="userid" />
+          </Key>
+          <Property Name="userid" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="username" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="userpassword" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="useractive" Type="nchar" MaxLength="1" Nullable="false" />
+          <Property Name="lastmodified" Type="datetime" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_parts_usertable">
+          <End Role="usertable" Type="Self.usertable" Multiplicity="0..1" />
+          <End Role="partsdb" Type="Self.partsdb" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="usertable">
+              <PropertyRef Name="userid" />
+            </Principal>
+            <Dependent Role="partsdb">
+              <PropertyRef Name="createdby" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_products_usertable">
+          <End Role="usertable" Type="Self.usertable" Multiplicity="0..1" />
+          <End Role="productsdb" Type="Self.productsdb" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="usertable">
+              <PropertyRef Name="userid" />
+            </Principal>
+            <Dependent Role="productsdb">
+              <PropertyRef Name="createdby" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_productsparts_parts">
+          <End Role="partsdb" Type="Self.partsdb" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="productsparts" Type="Self.productsparts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="partsdb">
+              <PropertyRef Name="partid" />
+            </Principal>
+            <Dependent Role="productsparts">
+              <PropertyRef Name="partid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_productsparts_products">
+          <End Role="productsdb" Type="Self.productsdb" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="productsparts" Type="Self.productsparts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="productsdb">
+              <PropertyRef Name="productid" />
+            </Principal>
+            <Dependent Role="productsparts">
+              <PropertyRef Name="productid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="InventoryMgmtModelStoreContainer">
+          <EntitySet Name="partsdb" EntityType="Self.partsdb" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="productsdb" EntityType="Self.productsdb" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="productsparts" EntityType="Self.productsparts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="usertable" EntityType="Self.usertable" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_parts_usertable" Association="Self.FK_parts_usertable">
+            <End Role="usertable" EntitySet="usertable" />
+            <End Role="partsdb" EntitySet="partsdb" />
+          </AssociationSet>
+          <AssociationSet Name="FK_products_usertable" Association="Self.FK_products_usertable">
+            <End Role="usertable" EntitySet="usertable" />
+            <End Role="productsdb" EntitySet="productsdb" />
+          </AssociationSet>
+          <AssociationSet Name="FK_productsparts_parts" Association="Self.FK_productsparts_parts">
+            <End Role="partsdb" EntitySet="partsdb" />
+            <End Role="productsparts" EntitySet="productsparts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_productsparts_products" Association="Self.FK_productsparts_products">
+            <End Role="productsdb" EntitySet="productsdb" />
+            <End Role="productsparts" EntitySet="productsparts" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="InventoryMgmtModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="partsdb">
+          <Key>
+            <PropertyRef Name="partid" />
+          </Key>
+          <Property Name="partid" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="createdby" Type="Int32" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="price" Type="Decimal" Precision="19" Scale="4" Nullable="false" />
+          <Property Name="instock" Type="Int32" Nullable="false" />
+          <Property Name="min" Type="Int32" Nullable="false" />
+          <Property Name="max" Type="Int32" Nullable="false" />
+          <Property Name="type" Type="String" MaxLength="1" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="details" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="lastmodified" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="usertable" Relationship="Self.FK_parts_usertable" FromRole="partsdb" ToRole="usertable" />
+          <NavigationProperty Name="productsparts" Relationship="Self.FK_productsparts_parts" FromRole="partsdb" ToRole="productsparts" />
+        </EntityType>
+        <EntityType Name="productsdb">
+          <Key>
+            <PropertyRef Name="productid" />
+          </Key>
+          <Property Name="productid" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="createdby" Type="Int32" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="price" Type="Decimal" Precision="19" Scale="4" Nullable="false" />
+          <Property Name="instock" Type="Int32" Nullable="false" />
+          <Property Name="min" Type="Int32" Nullable="false" />
+          <Property Name="max" Type="Int32" Nullable="false" />
+          <Property Name="lastmodified" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="usertable" Relationship="Self.FK_products_usertable" FromRole="productsdb" ToRole="usertable" />
+          <NavigationProperty Name="productsparts" Relationship="Self.FK_productsparts_products" FromRole="productsdb" ToRole="productsparts" />
+        </EntityType>
+        <EntityType Name="productspart">
+          <Key>
+            <PropertyRef Name="productpartid" />
+          </Key>
+          <Property Name="productpartid" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="productid" Type="Int32" Nullable="false" />
+          <Property Name="partid" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="partsdb" Relationship="Self.FK_productsparts_parts" FromRole="productsparts" ToRole="partsdb" />
+          <NavigationProperty Name="productsdb" Relationship="Self.FK_productsparts_products" FromRole="productsparts" ToRole="productsdb" />
+        </EntityType>
+        <EntityType Name="sysdiagram">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="usertable">
+          <Key>
+            <PropertyRef Name="userid" />
+          </Key>
+          <Property Name="userid" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="userpassword" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="useractive" Type="String" MaxLength="1" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="lastmodified" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="partsdbs" Relationship="Self.FK_parts_usertable" FromRole="usertable" ToRole="partsdb" />
+          <NavigationProperty Name="productsdbs" Relationship="Self.FK_products_usertable" FromRole="usertable" ToRole="productsdb" />
+        </EntityType>
+        <Association Name="FK_parts_usertable">
+          <End Role="usertable" Type="Self.usertable" Multiplicity="0..1" />
+          <End Role="partsdb" Type="Self.partsdb" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="usertable">
+              <PropertyRef Name="userid" />
+            </Principal>
+            <Dependent Role="partsdb">
+              <PropertyRef Name="createdby" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_productsparts_parts">
+          <End Role="partsdb" Type="Self.partsdb" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="productsparts" Type="Self.productspart" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="partsdb">
+              <PropertyRef Name="partid" />
+            </Principal>
+            <Dependent Role="productsparts">
+              <PropertyRef Name="partid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_products_usertable">
+          <End Role="usertable" Type="Self.usertable" Multiplicity="0..1" />
+          <End Role="productsdb" Type="Self.productsdb" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="usertable">
+              <PropertyRef Name="userid" />
+            </Principal>
+            <Dependent Role="productsdb">
+              <PropertyRef Name="createdby" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_productsparts_products">
+          <End Role="productsdb" Type="Self.productsdb" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="productsparts" Type="Self.productspart" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="productsdb">
+              <PropertyRef Name="productid" />
+            </Principal>
+            <Dependent Role="productsparts">
+              <PropertyRef Name="productid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="InventoryMgmtEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="partsdbs" EntityType="Self.partsdb" />
+          <EntitySet Name="productsdbs" EntityType="Self.productsdb" />
+          <EntitySet Name="productsparts" EntityType="Self.productspart" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
+          <EntitySet Name="usertables" EntityType="Self.usertable" />
+          <AssociationSet Name="FK_parts_usertable" Association="Self.FK_parts_usertable">
+            <End Role="usertable" EntitySet="usertables" />
+            <End Role="partsdb" EntitySet="partsdbs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_productsparts_parts" Association="Self.FK_productsparts_parts">
+            <End Role="partsdb" EntitySet="partsdbs" />
+            <End Role="productsparts" EntitySet="productsparts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_products_usertable" Association="Self.FK_products_usertable">
+            <End Role="usertable" EntitySet="usertables" />
+            <End Role="productsdb" EntitySet="productsdbs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_productsparts_products" Association="Self.FK_productsparts_products">
+            <End Role="productsdb" EntitySet="productsdbs" />
+            <End Role="productsparts" EntitySet="productsparts" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="InventoryMgmtModelStoreContainer" CdmEntityContainer="InventoryMgmtEntities">
+          <EntitySetMapping Name="partsdbs">
+            <EntityTypeMapping TypeName="InventoryMgmtModel.partsdb">
+              <MappingFragment StoreEntitySet="partsdb">
+                <ScalarProperty Name="partid" ColumnName="partid" />
+                <ScalarProperty Name="createdby" ColumnName="createdby" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="instock" ColumnName="instock" />
+                <ScalarProperty Name="min" ColumnName="min" />
+                <ScalarProperty Name="max" ColumnName="max" />
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="details" ColumnName="details" />
+                <ScalarProperty Name="lastmodified" ColumnName="lastmodified" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="productsdbs">
+            <EntityTypeMapping TypeName="InventoryMgmtModel.productsdb">
+              <MappingFragment StoreEntitySet="productsdb">
+                <ScalarProperty Name="productid" ColumnName="productid" />
+                <ScalarProperty Name="createdby" ColumnName="createdby" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="instock" ColumnName="instock" />
+                <ScalarProperty Name="min" ColumnName="min" />
+                <ScalarProperty Name="max" ColumnName="max" />
+                <ScalarProperty Name="lastmodified" ColumnName="lastmodified" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="productsparts">
+            <EntityTypeMapping TypeName="InventoryMgmtModel.productspart">
+              <MappingFragment StoreEntitySet="productsparts">
+                <ScalarProperty Name="productpartid" ColumnName="productpartid" />
+                <ScalarProperty Name="productid" ColumnName="productid" />
+                <ScalarProperty Name="partid" ColumnName="partid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="InventoryMgmtModel.sysdiagram">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="definition" ColumnName="definition" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="usertables">
+            <EntityTypeMapping TypeName="InventoryMgmtModel.usertable">
+              <MappingFragment StoreEntitySet="usertable">
+                <ScalarProperty Name="userid" ColumnName="userid" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="userpassword" ColumnName="userpassword" />
+                <ScalarProperty Name="useractive" ColumnName="useractive" />
+                <ScalarProperty Name="lastmodified" ColumnName="lastmodified" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
